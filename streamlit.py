@@ -1,6 +1,8 @@
 import xgboost as xgb
 import streamlit as st
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Loading up the Regression model we created
 model = xgb.XGBRegressor()
@@ -75,3 +77,37 @@ if st.button('Predict Price'):
     price_in_usd = predict(carat, cut, color, clarity, depth, table, x, y, z)
     price_in_inr = price_in_usd * exchange_rate_usd_to_inr
     st.success(f'The predicted price of the diamond is ₹{price_in_inr:.2f} INR')
+
+# Load diamond data for visualization
+diamond_data = pd.read_csv("diamond_data.csv")
+
+# Display histograms for numeric features
+st.subheader('Feature Distributions')
+fig, ax = plt.subplots(2, 2, figsize=(12, 8))
+sns.histplot(diamond_data['carat'], ax=ax[0, 0], kde=True)
+ax[0, 0].set_title('Carat Distribution')
+sns.histplot(diamond_data['depth'], ax=ax[0, 1], kde=True)
+ax[0, 1].set_title('Depth Distribution')
+sns.histplot(diamond_data['table'], ax=ax[1, 0], kde=True)
+ax[1, 0].set_title('Table Distribution')
+sns.histplot(diamond_data['price'], ax=ax[1, 1], kde=True)
+ax[1, 1].set_title('Price Distribution')
+st.pyplot(fig)
+
+# Scatter plot between carat and price
+st.subheader('Scatter plot of Carat vs Price')
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='carat', y='price', data=diamond_data)
+plt.xlabel('Carat')
+plt.ylabel('Price')
+st.pyplot()
+
+# Feature Importance Plot
+st.subheader('Feature Importance')
+feature_importance = model.feature_importances_
+features = ['carat', 'cut', 'color', 'clarity', 'depth', 'table', 'x', 'y', 'z']
+plt.figure(figsize=(8, 6))
+sns.barplot(x=feature_importance, y=features, orient='h')
+plt.xlabel('Feature Importance')
+plt.ylabel('Feature')
+st.pyplot()
