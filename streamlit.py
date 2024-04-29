@@ -1,18 +1,18 @@
 import xgboost as xgb
 import streamlit as st
 import pandas as pd
+from forex_python.converter import CurrencyRates
 
-#Loading up the Regression model we created
+# Loading up the Regression model we created
 model = xgb.XGBRegressor()
 model.load_model('xgb_model.json')
 
-#Caching the model for faster loading
+# Caching the model for faster loading
 @st.cache
-
 
 # Define the prediction function
 def predict(carat, cut, color, clarity, depth, table, x, y, z):
-    #Predicting the price of the carat
+    # Predicting the price of the carat
     if cut == 'Fair':
         cut = 0
     elif cut == 'Good':
@@ -38,7 +38,7 @@ def predict(carat, cut, color, clarity, depth, table, x, y, z):
         color = 5
     elif color == 'D':
         color = 6
-    
+
     if clarity == 'I1':
         clarity = 0
     elif clarity == 'SI2':
@@ -55,14 +55,13 @@ def predict(carat, cut, color, clarity, depth, table, x, y, z):
         clarity = 6
     elif clarity == 'IF':
         clarity = 7
-    
 
-    prediction = model.predict(pd.DataFrame([[carat, cut, color, clarity, depth, table, x, y, z]], columns=['carat', 'cut', 'color', 'clarity', 'depth', 'table', 'x', 'y', 'z']))
+    prediction = model.predict(pd.DataFrame([[carat, cut, color, clarity, depth, table, x, y, z]],
+                                            columns=['carat', 'cut', 'color', 'clarity', 'depth', 'table', 'x', 'y', 'z']))
     return prediction
 
-
 st.title('Diamond Price Predictor')
-st.image("""https://www.thestreet.com/.image/ar_4:3%2Cc_fill%2Ccs_srgb%2Cq_auto:good%2Cw_1200/MTY4NjUwNDYyNTYzNDExNTkx/why-dominion-diamonds-second-trip-to-the-block-may-be-different.png""")
+st.image("https://www.thestreet.com/.image/ar_4:3%2Cc_fill%2Ccs_srgb%2Cq_auto:good%2Cw_1200/MTY4NjUwNDYyNTYzNDExNTkx/why-dominion-diamonds-second-trip-to-the-block-may-be-different.png")
 st.header('Enter the characteristics of the diamond:')
 carat = st.number_input('Carat Weight:', min_value=0.1, max_value=10.0, value=1.0)
 cut = st.selectbox('Cut Rating:', ['Fair', 'Good', 'Very Good', 'Premium', 'Ideal'])
@@ -76,4 +75,6 @@ z = st.number_input('Diamond Height (Z) in mm:', min_value=0.1, max_value=100.0,
 
 if st.button('Predict Price'):
     price = predict(carat, cut, color, clarity, depth, table, x, y, z)
-    st.success(f'The predicted price of the diamond is ${price[0]:.2f} USD')
+    currency_converter = CurrencyRates()
+    converted_price = currency_converter.convert("USD", "EUR", price[0])  # Convert to Euro for example
+    st.success(f'The predicted price of the diamond is {converted_price:.2f} EUR')
