@@ -1,7 +1,6 @@
 import xgboost as xgb
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # Loading up the Regression model we created
 model = xgb.XGBRegressor()
@@ -76,31 +75,3 @@ if st.button('Predict Price'):
     price_in_usd = predict(carat, cut, color, clarity, depth, table, x, y, z)
     price_in_inr = price_in_usd * exchange_rate_usd_to_inr
     st.success(f'The predicted price of the diamond is ₹{price_in_inr:.2f} INR')
-
-# Load diamond data for visualization
-diamond_data = pd.read_csv("diamonds.csv")
-
-# Display histograms for numeric features
-st.subheader('Feature Distributions')
-fig, axes = plt.subplots(2, 2, figsize=(12, 8))
-diamond_data['carat'].plot.hist(ax=axes[0, 0], bins=30, alpha=0.7)
-axes[0, 0].set_title('Carat Distribution')
-
-diamond_data['depth'].plot.hist(ax=axes[0, 1], bins=30, alpha=0.7)
-axes[0, 1].set_title('Depth Distribution')
-
-diamond_data['table'].plot.hist(ax=axes[1, 0], bins=30, alpha=0.7)
-axes[1, 0].set_title('Table Distribution')
-
-diamond_data['price'].plot.hist(ax=axes[1, 1], bins=30, alpha=0.7)
-axes[1, 1].set_title('Price Distribution')
-
-st.pyplot(fig)
-
-# Scatter plot between carat and price
-st.subheader('Scatter plot of Carat vs Price')
-plt.figure(figsize=(8, 6))
-plt.scatter(diamond_data['carat'], diamond_data['price'], alpha=0.5)
-plt.xlabel('Carat')
-plt.ylabel('Price')
-st.pyplot()
