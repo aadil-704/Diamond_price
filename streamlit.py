@@ -9,9 +9,18 @@ import time
 script_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(script_dir, 'xgb_model.json')
 
+# Check if the model file exists
+if not os.path.exists(model_path):
+    st.error(f"Model file '{model_path}' not found. Please ensure the correct path to the model file.")
+    st.stop()
+
 # Loading up the Regression model we created
-model = xgb.XGBRegressor()
-model.load_model(model_path)
+try:
+    model = xgb.XGBRegressor()
+    model.load_model(model_path)
+except xgb.core.XGBoostError as e:
+    st.error(f"Error loading the XGBoost model: {e}")
+    st.stop()
 
 # Caching the model for faster loading
 @st.cache
