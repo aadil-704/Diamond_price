@@ -79,7 +79,7 @@ if st.button('Predict Price'):
     st.success(f'The predicted price of the diamond is ₹{price_in_inr:.2f} INR')
 
 # Load diamond data for visualization
-diamond_data = pd.read_csv("diamond_data.csv")
+diamond_data = pd.read_csv("diamonds.csv")
 
 # Display histograms for numeric features
 st.subheader('Feature Distributions')
