@@ -1,8 +1,6 @@
 import xgboost as xgb
 import streamlit as st
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 import plotly.express as px
 
 # Loading up the Regression model we created
@@ -12,7 +10,7 @@ model.load_model('xgb_model.json')
 # Caching the model for faster loading
 @st.cache
 def predict(carat, cut, color, clarity, depth, table, x, y, z):
-    # Predicting the price of the carat
+    #Predicting the price of the carat
     if cut == 'Fair':
         cut = 0
     elif cut == 'Good':
