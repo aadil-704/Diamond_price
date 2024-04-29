@@ -1,11 +1,16 @@
+import os
 import xgboost as xgb
 import streamlit as st
 import pandas as pd
 import requests
 
+# Get the directory where the script is located
+script_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(script_dir, 'xgb_model.json')
+
 # Loading up the Regression model we created
 model = xgb.XGBRegressor()
-model.load_model('xgb_model.json')
+model.load_model(model_path)
 
 # Caching the model for faster loading
 @st.cache
