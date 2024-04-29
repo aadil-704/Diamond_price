@@ -1,7 +1,7 @@
 import xgboost as xgb
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import matplotlib.pyplot as plt
 
 # Loading up the Regression model we created
 model = xgb.XGBRegressor()
@@ -82,19 +82,25 @@ diamond_data = pd.read_csv("diamonds.csv")
 
 # Display histograms for numeric features
 st.subheader('Feature Distributions')
-fig = px.histogram(diamond_data, x='carat', title='Carat Distribution', nbins=30, histnorm='density')
-st.plotly_chart(fig)
+fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+diamond_data['carat'].plot.hist(ax=axes[0, 0], bins=30, alpha=0.7)
+axes[0, 0].set_title('Carat Distribution')
 
-fig = px.histogram(diamond_data, x='depth', title='Depth Distribution', nbins=30, histnorm='density')
-st.plotly_chart(fig)
+diamond_data['depth'].plot.hist(ax=axes[0, 1], bins=30, alpha=0.7)
+axes[0, 1].set_title('Depth Distribution')
 
-fig = px.histogram(diamond_data, x='table', title='Table Distribution', nbins=30, histnorm='density')
-st.plotly_chart(fig)
+diamond_data['table'].plot.hist(ax=axes[1, 0], bins=30, alpha=0.7)
+axes[1, 0].set_title('Table Distribution')
 
-fig = px.histogram(diamond_data, x='price', title='Price Distribution', nbins=30, histnorm='density')
-st.plotly_chart(fig)
+diamond_data['price'].plot.hist(ax=axes[1, 1], bins=30, alpha=0.7)
+axes[1, 1].set_title('Price Distribution')
+
+st.pyplot(fig)
 
 # Scatter plot between carat and price
 st.subheader('Scatter plot of Carat vs Price')
-fig = px.scatter(diamond_data, x='carat', y='price', title='Carat vs Price')
-st.plotly_chart(fig)
+plt.figure(figsize=(8, 6))
+plt.scatter(diamond_data['carat'], diamond_data['price'], alpha=0.5)
+plt.xlabel('Carat')
+plt.ylabel('Price')
+st.pyplot()
