@@ -1,7 +1,7 @@
 import xgboost as xgb
 import streamlit as st
 import pandas as pd
-from forex_python.converter import CurrencyRates
+import requests
 
 # Loading up the Regression model we created
 model = xgb.XGBRegressor()
@@ -75,6 +75,12 @@ z = st.number_input('Diamond Height (Z) in mm:', min_value=0.1, max_value=100.0,
 
 if st.button('Predict Price'):
     price = predict(carat, cut, color, clarity, depth, table, x, y, z)
-    currency_converter = CurrencyRates()
-    converted_price = currency_converter.convert("USD", "EUR", price[0])  # Convert to Euro for example
-    st.success(f'The predicted price of the diamond is {converted_price:.2f} EUR')
+    # Fetch exchange rate from an API (e.g., exchange rates API)
+    response = requests.get('https://api.exchangeratesapi.io/latest?base=USD')
+    if response.status_code == 200:
+        data = response.json()
+        exchange_rate = data['rates'].get('EUR', 1.0)  # Get exchange rate for EUR, default to 1.0 if not found
+        converted_price = price[0] * exchange_rate
+        st.success(f'The predicted price of the diamond is {converted_price:.2f} EUR')
+    else:
+        st.error('Failed to fetch exchange rates, please try again later.')
