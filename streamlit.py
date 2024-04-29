@@ -54,7 +54,7 @@ def predict(carat, cut, color, clarity, depth, table, x, y, z):
         clarity = 7
 
     prediction = model.predict(pd.DataFrame([[carat, cut, color, clarity, depth, table, x, y, z]], columns=['carat', 'cut', 'color', 'clarity', 'depth', 'table', 'x', 'y', 'z']))
-    return prediction
+    return prediction[0]  # Returning the first element of the prediction array
 
 st.title('Diamond Price Predictor')
 st.image("https://www.thestreet.com/.image/ar_4:3%2Cc_fill%2Ccs_srgb%2Cq_auto:good%2Cw_1200/MTY4NjUwNDYyNTYzNDExNTkx/why-dominion-diamonds-second-trip-to-the-block-may-be-different.png")
@@ -69,7 +69,7 @@ x = st.number_input('Diamond Length (X) in mm:', min_value=0.1, max_value=100.0,
 y = st.number_input('Diamond Width (Y) in mm:', min_value=0.1, max_value=100.0, value=1.0)
 z = st.number_input('Diamond Height (Z) in mm:', min_value=0.1, max_value=100.0, value=1.0)
 
-exchange_rate_usd_to_inr = 84  # Conversion rate from USD to INR
+exchange_rate_usd_to_inr = 75  # Conversion rate from USD to INR
 
 if st.button('Predict Price'):
     price_in_usd = predict(carat, cut, color, clarity, depth, table, x, y, z)
