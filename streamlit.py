@@ -1,33 +1,18 @@
-import os
 import xgboost as xgb
 import streamlit as st
 import pandas as pd
-import requests
-import time
 
-# Get the directory where the script is located
-script_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(script_dir, 'xgb_model.json')
+#Loading up the Regression model we created
+model = xgb.XGBRegressor()
+model.load_model('xgb_model.json')
 
-# Check if the model file exists
-if not os.path.exists(model_path):
-    st.error(f"Model file '{model_path}' not found. Please ensure the correct path to the model file.")
-    st.stop()
-
-# Loading up the Regression model we created
-try:
-    model = xgb.XGBRegressor()
-    model.load_model(model_path)
-except xgb.core.XGBoostError as e:
-    st.error(f"Error loading the XGBoost model: {e}")
-    st.stop()
-
-# Caching the model for faster loading
+#Caching the model for faster loading
 @st.cache
+
 
 # Define the prediction function
 def predict(carat, cut, color, clarity, depth, table, x, y, z):
-    # Predicting the price of the carat
+    #Predicting the price of the carat
     if cut == 'Fair':
         cut = 0
     elif cut == 'Good':
@@ -53,7 +38,7 @@ def predict(carat, cut, color, clarity, depth, table, x, y, z):
         color = 5
     elif color == 'D':
         color = 6
-
+    
     if clarity == 'I1':
         clarity = 0
     elif clarity == 'SI2':
@@ -70,13 +55,14 @@ def predict(carat, cut, color, clarity, depth, table, x, y, z):
         clarity = 6
     elif clarity == 'IF':
         clarity = 7
+    
 
-    prediction = model.predict(pd.DataFrame([[carat, cut, color, clarity, depth, table, x, y, z]],
-                                            columns=['carat', 'cut', 'color', 'clarity', 'depth', 'table', 'x', 'y', 'z']))
+    prediction = model.predict(pd.DataFrame([[carat, cut, color, clarity, depth, table, x, y, z]], columns=['carat', 'cut', 'color', 'clarity', 'depth', 'table', 'x', 'y', 'z']))
     return prediction
 
+
 st.title('Diamond Price Predictor')
-st.image("https://www.thestreet.com/.image/ar_4:3%2Cc_fill%2Ccs_srgb%2Cq_auto:good%2Cw_1200/MTY4NjUwNDYyNTYzNDExNTkx/why-dominion-diamonds-second-trip-to-the-block-may-be-different.png")
+st.image("""https://www.thestreet.com/.image/ar_4:3%2Cc_fill%2Ccs_srgb%2Cq_auto:good%2Cw_1200/MTY4NjUwNDYyNTYzNDExNTkx/why-dominion-diamonds-second-trip-to-the-block-may-be-different.png""")
 st.header('Enter the characteristics of the diamond:')
 carat = st.number_input('Carat Weight:', min_value=0.1, max_value=10.0, value=1.0)
 cut = st.selectbox('Cut Rating:', ['Fair', 'Good', 'Very Good', 'Premium', 'Ideal'])
@@ -90,22 +76,4 @@ z = st.number_input('Diamond Height (Z) in mm:', min_value=0.1, max_value=100.0,
 
 if st.button('Predict Price'):
     price = predict(carat, cut, color, clarity, depth, table, x, y, z)
-    
-    # Retry fetching exchange rates data
-    max_retries = 3
-    retry_delay = 1
-    for attempt in range(max_retries):
-        response = requests.get('https://api.exchangeratesapi.io/latest?base=USD')
-        if response.status_code == 200:
-            data = response.json()
-            rates = data.get('rates')
-            if rates is not None:
-                exchange_rate = rates.get('EUR', 1.0)
-                converted_price = price[0] * exchange_rate
-                st.success(f'The predicted price of the diamond is {converted_price:.2f} EUR')
-                break
-        # Wait before retrying
-        time.sleep(retry_delay)
-    else:
-        # All retries failed, handle error
-        st.error('Failed to fetch exchange rates data after multiple attempts. Please try again later.')
+    st.success(f'The predicted price of the diamond is ${price[0]:.2f} USD')
