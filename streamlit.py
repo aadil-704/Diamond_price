@@ -3,6 +3,7 @@ import xgboost as xgb
 import streamlit as st
 import pandas as pd
 import requests
+import time
 
 # Get the directory where the script is located
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -80,16 +81,22 @@ z = st.number_input('Diamond Height (Z) in mm:', min_value=0.1, max_value=100.0,
 
 if st.button('Predict Price'):
     price = predict(carat, cut, color, clarity, depth, table, x, y, z)
-    # Fetch exchange rate from an API (e.g., exchange rates API)
-    response = requests.get('https://api.exchangeratesapi.io/latest?base=USD')
-    if response.status_code == 200:
-        data = response.json()
-        rates = data.get('rates')
-        if rates is not None:
-            exchange_rate = rates.get('EUR', 1.0)  # Get exchange rate for EUR, default to 1.0 if not found
-            converted_price = price[0] * exchange_rate
-            st.success(f'The predicted price of the diamond is {converted_price:.2f} EUR')
-        else:
-            st.error('Failed to fetch exchange rates data, please try again later.')
+    
+    # Retry fetching exchange rates data
+    max_retries = 3
+    retry_delay = 1
+    for attempt in range(max_retries):
+        response = requests.get('https://api.exchangeratesapi.io/latest?base=USD')
+        if response.status_code == 200:
+            data = response.json()
+            rates = data.get('rates')
+            if rates is not None:
+                exchange_rate = rates.get('EUR', 1.0)
+                converted_price = price[0] * exchange_rate
+                st.success(f'The predicted price of the diamond is {converted_price:.2f} EUR')
+                break
+        # Wait before retrying
+        time.sleep(retry_delay)
     else:
-        st.error('Failed to fetch exchange rates, please try again later.')
+        # All retries failed, handle error
+        st.error('Failed to fetch exchange rates data after multiple attempts. Please try again later.')
