@@ -96,11 +96,12 @@ st.pyplot(fig)
 
 # Scatter plot between carat and price
 st.subheader('Scatter plot of Carat vs Price')
-plt.figure(figsize=(8, 6))  # Adjust the figure size as needed
-sns.scatterplot(x='carat', y='price', data=diamond_data)
-plt.xlabel('Carat')
-plt.ylabel('Price')
-st.pyplot(plt.gcf())  # Pass the current figure explicitly
+fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the figure size as needed
+sns.scatterplot(x='carat', y='price', data=diamond_data, ax=ax)
+ax.set_xlabel('Carat')
+ax.set_ylabel('Price')
+st.pyplot(fig)
+
 
 
 # Feature Importance Plot
