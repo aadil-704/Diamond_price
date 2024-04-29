@@ -104,12 +104,3 @@ st.pyplot(fig)
 
 
 
-# Feature Importance Plot
-st.subheader('Feature Importance')
-feature_importance = model.feature_importances_
-features = ['carat', 'cut', 'color', 'clarity', 'depth', 'table', 'x', 'y', 'z']
-plt.figure(figsize=(8, 6))
-sns.barplot(y=feature_importance, x=features, orient='h')
-plt.xlabel('Feature Importance')
-plt.ylabel('Feature')
-st.pyplot()
