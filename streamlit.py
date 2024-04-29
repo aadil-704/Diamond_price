@@ -79,8 +79,12 @@ if st.button('Predict Price'):
     response = requests.get('https://api.exchangeratesapi.io/latest?base=USD')
     if response.status_code == 200:
         data = response.json()
-        exchange_rate = data['rates'].get('EUR', 1.0)  # Get exchange rate for EUR, default to 1.0 if not found
-        converted_price = price[0] * exchange_rate
-        st.success(f'The predicted price of the diamond is {converted_price:.2f} EUR')
+        rates = data.get('rates')
+        if rates is not None:
+            exchange_rate = rates.get('EUR', 1.0)  # Get exchange rate for EUR, default to 1.0 if not found
+            converted_price = price[0] * exchange_rate
+            st.success(f'The predicted price of the diamond is {converted_price:.2f} EUR')
+        else:
+            st.error('Failed to fetch exchange rates data, please try again later.')
     else:
         st.error('Failed to fetch exchange rates, please try again later.')
